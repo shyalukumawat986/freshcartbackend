@@ -1,22 +1,125 @@
 
-express=require("express")
+const express = require("express");
+const cors = require("cors");
+const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
 
-app=express()
+const app = express();
 
-app.listen(5000,()=>{
-    console.log("server start")
-})
-
-// cors 
-cors=require("cors")
+// ✅ Middleware
 app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// ✅ MongoDB Connection
+mongoose
+  .connect("mongodb://127.0.0.1:27017/freshcart", {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("✅ Database connected"))
+  .catch((err) => console.log("❌ DB Error:", err));
+
+// ✅ Import Mongoose Model
+const Allusers = require("./models/Users");
+// (If Products model not needed now, comment it)
+const Ourproducts = require("./models/Products");
+const OurWishlist= require("./models/Wishlist");
 
 
-// bodyparser 
-const bodyParser = require("body-parser")
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({}))
+// ✅ Signup Route
+app.post("/signup", async (req, res) => {
+  try {
+    console.log("📥 Received data:", req.body); // 👈 Add this line to debug
 
-app.post("/signup",(req,res)=>{
-    console.log(req.body)
+    const { name, email, password } = req.body;
+
+    if (!name || !email || !password) {
+      return res.json({ status: false, message: "All fields required" });
+    }
+
+    // Check for duplicate email
+    const existingUser = await Allusers.findOne({ email });
+    if (existingUser) {
+      return res.json({ status: false, message: "Email already registered" });
+    }
+
+    // Create and save user
+    const newUser = new Allusers({ name, email, password });
+    await newUser.save();
+
+    console.log("✅ User saved:", newUser); // 👈 Debug confirmation
+
+    res.json({ status: true, message: "User registered successfully" });
+  } catch (err) {
+    console.error("❌ Signup Error:", err);
+    res.json({ status: false, message: "Error saving user", error: err });
+  }
+});
+
+
+
+
+// add product -------------------------
+
+app.post("/addproduct",async(req,res)=>{
+   let a=await Ourproducts.insertOne({
+    productimage:req.body.product.productimage,
+    category:req.body.product.category,
+    name:req.body.product.name,
+    rating:req.body.product.rating,
+    price:req.body.product.price,
+    oldprice:req.body.product.oldprice,
+
+   })
+
+
+   let result= await a.save();
+
+   
+
 })
+
+
+// get products 
+app.get("/popularproducts",async(req,res)=>{
+  let myproducts=await Ourproducts.find({})
+  
+  if(myproducts){
+    res.json({
+      status:true,
+      popularproducts:myproducts
+    })
+  }
+  else{
+    res.json({
+      status:false
+    })
+  }
+})
+
+
+
+
+app.post("/wishlistitem",async(req,res)=>{
+    let a=await OurWishlist.insertOne({
+      productimage:req.body.wishlistitem.productimage,
+    })
+
+    let result=await a.save()
+})
+
+
+
+
+
+
+// Start Server
+app.listen(5000, () => {
+  console.log("🚀 Server running on port 5000");
+});
+
+
+
+
+
