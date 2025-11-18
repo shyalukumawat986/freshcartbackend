@@ -24,37 +24,31 @@ mongoose
 const Allusers = require("./models/Users");
 // (If Products model not needed now, comment it)
 const Ourproducts = require("./models/Products");
-const OurWishlist= require("./models/Wishlist");
-const  Cartitem  = require("./models/Cartitem");
+const OurWishlist = require("./models/Wishlist");
+const Cartitem = require("./models/Cartitem");
 
 
 // ✅ Signup Route
 app.post("/signup", async (req, res) => {
-  try {
-    console.log("📥 Received data:", req.body); // 👈 Add this line to debug
+   let a = await Allusers.insertOne({
+      name:req.body.name,
+      email:req.body.email,
+      password:req.body.password
 
-    const { name, email, password } = req.body;
+  })
 
-    if (!name || !email || !password) {
-      return res.json({ status: false, message: "All fields required" });
-    }
 
-    // Check for duplicate email
-    const existingUser = await Allusers.findOne({ email });
-    if (existingUser) {
-      return res.json({ status: false, message: "Email already registered" });
-    }
+  let result = await a.save();
 
-    // Create and save user
-    const newUser = new Allusers({ name, email, password });
-    await newUser.save();
-
-    console.log("✅ User saved:", newUser); // 👈 Debug confirmation
-
-    res.json({ status: true, message: "User registered successfully" });
-  } catch (err) {
-    console.error("❌ Signup Error:", err);
-    res.json({ status: false, message: "Error saving user", error: err });
+  if(result){
+    res.json({
+      status:true
+    })
+  }
+  else{
+    res.json({
+      status:false
+    })
   }
 });
 
@@ -63,38 +57,38 @@ app.post("/signup", async (req, res) => {
 
 // add product -------------------------
 
-app.post("/addproduct",async(req,res)=>{
-   let a=await Ourproducts.insertOne({
-    productimage:req.body.product.productimage,
-    category:req.body.product.category,
-    name:req.body.product.name,
-    rating:req.body.product.rating,
-    price:req.body.product.price,
-    oldprice:req.body.product.oldprice,
+app.post("/addproduct", async (req, res) => {
+  let a = await Ourproducts.insertOne({
+    productimage: req.body.product.productimage,
+    category: req.body.product.category,
+    name: req.body.product.name,
+    rating: req.body.product.rating,
+    price: req.body.product.price,
+    oldprice: req.body.product.oldprice,
 
-   })
+  })
 
 
-   let result= await a.save();
+  let result = await a.save();
 
-   
+
 
 })
 
 
 // get products 
-app.get("/popularproducts",async(req,res)=>{
-  let myproducts=await Ourproducts.find({})
-  
-  if(myproducts){
+app.get("/popularproducts", async (req, res) => {
+  let myproducts = await Ourproducts.find({})
+
+  if (myproducts) {
     res.json({
-      status:true,
-      popularproducts:myproducts
+      status: true,
+      popularproducts: myproducts
     })
   }
-  else{
+  else {
     res.json({
-      status:false
+      status: false
     })
   }
 })
@@ -103,36 +97,36 @@ app.get("/popularproducts",async(req,res)=>{
 
 // wishlist ------
 
-app.post("/wishlistitem",async(req,res)=>{
-    let a=await OurWishlist.insertOne({
-      productimage:req.body.wishlistitem.productimage,
-      name:req.body.wishlistitem.name,
-      price:req.body.wishlistitem.price,
-    })
+app.post("/wishlistitem", async (req, res) => {
+  let a = await OurWishlist.insertOne({
+    productimage: req.body.wishlistitem.productimage,
+    name: req.body.wishlistitem.name,
+    price: req.body.wishlistitem.price,
+  })
 
-    let result=await a.save()
+  let result = await a.save()
 })
 
 // get Wishlist
-app.get("/wishlist",async(req,res)=>{
-  let mywishlist=await OurWishlist.find({})
-  
-  if(mywishlist){
+app.get("/wishlist", async (req, res) => {
+  let mywishlist = await OurWishlist.find({})
+
+  if (mywishlist) {
     res.json({
-      status:true,
-      wishlist:mywishlist
+      status: true,
+      wishlist: mywishlist
     })
   }
-  else{
+  else {
     res.json({
-      status:false
+      status: false
     })
   }
 })
 
 // removewishlistitem ---------------
-app.post("/removewishlistitem",async(req,res)=>{
-    await OurWishlist.findOneAndDelete({"_id":req.body.item._id})
+app.post("/removewishlistitem", async (req, res) => {
+  await OurWishlist.findOneAndDelete({ "_id": req.body.item._id })
 })
 
 
@@ -160,9 +154,9 @@ app.listen(5000, () => {
   console.log("🚀 Server running on port 5000");
 });
 
-app.get("/",(req,res)=>{
+app.get("/", (req, res) => {
   res.json({
-    status:true
+    status: true
   })
 })
 
