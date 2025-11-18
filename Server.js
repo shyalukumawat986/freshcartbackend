@@ -13,7 +13,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // ✅ MongoDB Connection
 mongoose
-  .connect("mongodb://127.0.0.1:27017/freshcart", {
+  .connect("mongodb+srv://shyalu:sQagtJSYSmhDQlHj@cluster0.q60pcqu.mongodb.net/freshcart", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
