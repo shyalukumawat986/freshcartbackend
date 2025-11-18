@@ -25,6 +25,7 @@ const Allusers = require("./models/Users");
 // (If Products model not needed now, comment it)
 const Ourproducts = require("./models/Products");
 const OurWishlist= require("./models/Wishlist");
+const  Cartitem  = require("./models/Cartitem");
 
 
 // ✅ Signup Route
@@ -100,14 +101,54 @@ app.get("/popularproducts",async(req,res)=>{
 
 
 
+// wishlist ------
 
 app.post("/wishlistitem",async(req,res)=>{
     let a=await OurWishlist.insertOne({
       productimage:req.body.wishlistitem.productimage,
+      name:req.body.wishlistitem.name,
+      price:req.body.wishlistitem.price,
     })
 
     let result=await a.save()
 })
+
+// get Wishlist
+app.get("/wishlist",async(req,res)=>{
+  let mywishlist=await OurWishlist.find({})
+  
+  if(mywishlist){
+    res.json({
+      status:true,
+      wishlist:mywishlist
+    })
+  }
+  else{
+    res.json({
+      status:false
+    })
+  }
+})
+
+// removewishlistitem ---------------
+app.post("/removewishlistitem",async(req,res)=>{
+    await OurWishlist.findOneAndDelete({"_id":req.body.item._id})
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

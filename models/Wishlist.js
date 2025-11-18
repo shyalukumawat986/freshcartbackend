@@ -1,10 +1,14 @@
 const { default: mongoose } = require("mongoose")
 
 const wishlistSchema = new mongoose.Schema({
-    productimage:String,
-    
+     productimage:String,
+     name:String,
+     price:String,
+  
+
 
 })
 
-const  ourwishlist= mongoose.model('wishlist', wishlistSchema);
-module.exports=ourwishlist;
+const  Ourwishlist= mongoose.model('wishlist', wishlistSchema);
+module.exports=Ourwishlist;
+  
